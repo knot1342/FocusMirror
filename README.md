@@ -1,56 +1,110 @@
-# Welcome to your Expo app 👋
+# FocusMirror
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+See how well you are really concentrating, and rest at the right time, using only your smartphone.
 
-## Get started
+FocusMirror uses the front camera to estimate your focus level while you study or work, suggests breaks when it detects fatigue, and tracks your sessions, streaks and weekly trends. All analysis runs on the device; video is never stored or sent anywhere.
 
-1. Install dependencies
+> **Status:** early development. The app shell, sign-in, home dashboard, settings and camera preview work. Focus detection from the camera is not implemented yet, so sessions are currently created from the Admin screen.
 
-   ```bash
-   npm install
-   ```
+## Features
 
-2. Start the app
+- **Sign in** with email and password (Supabase Auth); the app is locked until you sign in
+- **Home dashboard**: usage-streak calendar, last session summary, and a 7-day focus chart
+- **Start session**: live front-camera preview with permission handling
+- **Settings**: profile, password, daily goal, fatigue sensitivity, camera calibration, notifications, theme (light/dark/system), language, data export and history clearing
+- **Admin tools**: adjust the streak and make up sessions for testing
+- **English and Japanese**, following the device language or a chosen one
 
-   ```bash
-   npx expo start
-   ```
+## Tech stack
 
-In the output, you'll find options to open the app in a
+- [Expo](https://expo.dev) SDK 57 with [Expo Router](https://docs.expo.dev/router/introduction/) (file-based routing, native tabs)
+- React Native, TypeScript, React Compiler
+- [Supabase](https://supabase.com) for authentication
+- `expo-camera`, `expo-notifications`, `expo-haptics`, `react-native-reanimated`
+- AsyncStorage for on-device data (sessions, streak, preferences)
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Getting started
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+### Prerequisites
 
-## Get a fresh project
+- Node.js (LTS)
+- [Expo Go](https://expo.dev/go) on your phone, or an Android emulator / iOS simulator
+- A free [Supabase](https://supabase.com) project
 
-When you're ready, run:
+### 1. Install
 
 ```bash
-npm run reset-project
+git clone https://github.com/knot1342/FocusMirror.git
+cd FocusMirror
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### 2. Configure Supabase
 
-### Other setup steps
+Copy the example env file and fill in your project's values:
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+```bash
+cp .env.example .env.local
+```
 
-## Learn more
+| Variable | Where to find it |
+|---|---|
+| `EXPO_PUBLIC_SUPABASE_URL` | Project Settings → Data API → Project URL (base URL only, e.g. `https://abcd.supabase.co`) |
+| `EXPO_PUBLIC_SUPABASE_ANON_KEY` | Project Settings → API Keys → publishable (or legacy `anon`) key |
 
-To learn more about developing your project with Expo, look at the following resources:
+Never use the `service_role` / secret key in the app. `.env.local` is git-ignored.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+### 3. Create a user
 
-## Join the community
+In the Supabase dashboard:
 
-Join our community of developers creating universal apps.
+1. **Authentication → Users → Add user → Create new user**, tick **Auto Confirm User**.
+2. Optional: **Authentication → Sign In / Providers** → turn off **Allow new users to sign up** if only your own accounts should exist.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+### 4. Run
+
+```bash
+npx expo start
+```
+
+Then scan the QR code with Expo Go, or press `a` (Android), `i` (iOS) or `w` (web). After changing `.env.local`, restart with `npx expo start --clear`.
+
+The camera needs a real device; simulators and the web build show no preview.
+
+## Scripts
+
+| Command | Description |
+|---|---|
+| `npm start` | Start the Expo dev server |
+| `npm run android` / `ios` / `web` | Start and open on a platform |
+| `npm run lint` | Run ESLint |
+| `npx tsc --noEmit` | Type-check |
+| `npx expo install <package>` | Add a package at the version matching the Expo SDK |
+
+## Project structure
+
+```
+src/
+├── app/                 # Screens (Expo Router)
+│   ├── _layout.tsx      # Root stack, auth guard, theme and language providers
+│   ├── index.tsx        # Sign-in screen
+│   ├── (tabs)/          # Bottom tabs: home, results, session
+│   ├── settings.tsx     # Settings and its sub-screens (theme, daily-goal, calibrate, ...)
+│   └── admin.tsx        # Admin tools
+├── components/          # Home cards, settings list, side menu, themed primitives
+├── hooks/               # Stores: auth, sessions, streak, preferences, account, theme
+├── lib/                 # Supabase client, notifications, session sounds
+├── i18n/                # Translations (en, ja) and language provider
+└── constants/theme.ts   # Colors, accent, spacing
+```
+
+## Privacy
+
+Camera frames are processed on the device only. Sessions, streak and preferences are stored locally with AsyncStorage; only sign-in goes through Supabase. Settings → Export my data shares everything stored on the device as JSON.
+
+## Roadmap
+
+- On-device focus detection (face, gaze and posture) during sessions
+- Session reports on the Result tab
+- Rest reminders and posture warnings during sessions
+- Syncing sessions to Supabase across devices
