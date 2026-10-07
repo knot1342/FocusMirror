@@ -6,9 +6,11 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
 import { MIN_PASSWORD_LENGTH } from '@/hooks/use-account';
+import { useAuth } from '@/hooks/use-auth';
 import { useTheme } from '@/hooks/use-theme';
 import { useLanguage } from '@/i18n/language';
 import type { Translations } from '@/i18n/translations';
+import { supabase } from '@/lib/supabase';
 
 type PasswordError = keyof Translations['changePassword']['errors'];
 
@@ -19,6 +21,8 @@ export default function ChangePasswordScreen() {
   const [next, setNext] = useState('');
   const [confirm, setConfirm] = useState('');
   const [error, setError] = useState<PasswordError | null>(null);
+  const [saving, setSaving] = useState(false);
+  const { session } = useAuth();
 
   function validate(): PasswordError | null {
     if (!current || !next || !confirm) return 'missing';
@@ -28,11 +32,24 @@ export default function ChangePasswordScreen() {
     return null;
   }
 
-  function handleSave() {
+  async function handleSave() {
     const result = validate();
     setError(result);
-    if (result) return;
-    // TODO: send to the auth server once it exists
+    if (result || saving || !session?.user.email) return;
+    setSaving(true);
+    // Supabase doesn't check the old password on update, so confirm it by signing in again first.
+    const check = await supabase.auth.signInWithPassword({ email: session.user.email, password: current });
+    if (check.error) {
+      setSaving(false);
+      setError('wrongCurrent');
+      return;
+    }
+    const update = await supabase.auth.updateUser({ password: next });
+    setSaving(false);
+    if (update.error) {
+      setError('failed');
+      return;
+    }
     Alert.alert(t.changePassword.updated);
     router.back();
   }

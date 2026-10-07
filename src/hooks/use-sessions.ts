@@ -14,8 +14,8 @@ export type FocusSession = {
   postureWarnings: number;
 };
 
-/** Placeholder history, relative to today, shown until the first real session is saved. */
-function sampleSessions(): FocusSession[] {
+/** Two weeks of made-up history ending today, for the Admin screen. */
+export function makeSampleSessions(): FocusSession[] {
   const plan = [
     // [days ago, start hour, minutes, score, distractions, posture warnings]
     [13, 9, 50, 71, 5, 1], [12, 20, 35, 64, 7, 2], [10, 10, 80, 78, 4, 1],
@@ -27,7 +27,7 @@ function sampleSessions(): FocusSession[] {
   return plan.map(([daysAgo, hour, minutes, score, distractions, posture]) => {
     const start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - daysAgo, hour);
     return {
-      id: `sample-${daysAgo}`,
+      id: `sample-${start.getTime()}`,
       startedAt: start.toISOString(),
       durationMinutes: minutes,
       focusScore: score,
@@ -39,8 +39,6 @@ function sampleSessions(): FocusSession[] {
 
 // Module-level store so every screen using the hook shares the same sessions.
 let sessions: readonly FocusSession[] = [];
-// Sample data only shows before anything was ever saved, so clearing history doesn't bring it back.
-let hasSaved = false;
 let loading: Promise<void> | null = null;
 const listeners = new Set<() => void>();
 
@@ -52,7 +50,6 @@ function emit(next: readonly FocusSession[]) {
 function load() {
   loading ??= AsyncStorage.getItem(STORAGE_KEY)
     .then((stored) => {
-      hasSaved = stored !== null;
       const parsed: unknown = stored ? JSON.parse(stored) : [];
       if (Array.isArray(parsed)) emit(parsed as FocusSession[]);
     })
@@ -72,30 +69,28 @@ function getSnapshot() {
   return sessions;
 }
 
-/** Saves a finished session. */
-export async function addSession(session: FocusSession) {
+/** Saves finished sessions; one with an id that already exists replaces it. */
+export async function addSessions(added: FocusSession[]) {
   await load();
-  hasSaved = true;
-  const next = [...sessions, session];
+  const ids = new Set(added.map((session) => session.id));
+  const next = [...sessions.filter((session) => !ids.has(session.id)), ...added];
   emit(next);
   AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next)).catch(() => {});
+}
+
+export function addSession(session: FocusSession) {
+  return addSessions([session]);
 }
 
 /** Deletes every recorded session. */
 export async function clearSessions() {
   await load();
-  hasSaved = true;
   emit([]);
   AsyncStorage.setItem(STORAGE_KEY, '[]').catch(() => {});
 }
 
-/** Every recorded session, oldest first. Falls back to sample data while none exist. */
+/** Every recorded session, oldest first. */
 export function useSessions() {
   const stored = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
-  const isSample = !hasSaved && stored.length === 0;
-  const all = isSample ? sampleSessions() : stored;
-  return {
-    sessions: [...all].sort((a, b) => a.startedAt.localeCompare(b.startedAt)),
-    isSample,
-  };
+  return [...stored].sort((a, b) => a.startedAt.localeCompare(b.startedAt));
 }

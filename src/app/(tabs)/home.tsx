@@ -11,6 +11,7 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { WeeklySummary } from '@/components/weekly-summary';
 import { Spacing } from '@/constants/theme';
+import { signOut } from '@/hooks/use-auth';
 import { useTheme } from '@/hooks/use-theme';
 import { useLanguage } from '@/i18n/language';
 
@@ -91,7 +92,7 @@ export default function HomeScreen() {
           {
             label: t.menu.signOut,
             icon: { ios: 'rectangle.portrait.and.arrow.right', android: 'logout', web: 'logout' },
-            onPress: () => router.replace('/'),
+            onPress: () => signOut(),
           },
         ]}
       />

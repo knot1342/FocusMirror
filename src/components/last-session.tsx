@@ -14,9 +14,18 @@ import { useLanguage } from '@/i18n/language';
 export function LastSession() {
   const theme = useTheme();
   const { language, t } = useLanguage();
-  const { sessions, isSample } = useSessions();
-  const session = sessions.at(-1);
-  if (!session) return null;
+  const session = useSessions().at(-1);
+
+  if (!session) {
+    return (
+      <ThemedView type="backgroundElement" style={styles.card}>
+        <ThemedText type="smallBold">{t.lastSession.title}</ThemedText>
+        <ThemedText type="small" themeColor="textSecondary">
+          {t.lastSession.empty}
+        </ThemedText>
+      </ThemedView>
+    );
+  }
 
   const when = new Intl.DateTimeFormat(language, {
     month: 'short',
@@ -36,7 +45,7 @@ export function LastSession() {
       <View style={styles.header}>
         <ThemedText type="smallBold">{t.lastSession.title}</ThemedText>
         <ThemedText type="small" themeColor="textSecondary">
-          {isSample ? t.common.sampleData : when}
+          {when}
         </ThemedText>
       </View>
 

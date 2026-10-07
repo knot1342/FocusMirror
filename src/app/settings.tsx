@@ -17,7 +17,7 @@ export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const { language, t, preference } = useLanguage();
   const preferences = usePreferences();
-  const { sessions, isSample } = useSessions();
+  const sessions = useSessions();
   const { days } = useUsageStreak();
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
 
@@ -43,7 +43,7 @@ export default function SettingsScreen() {
       exportedAt: new Date().toISOString(),
       preferences,
       usageDays: [...days].sort(),
-      sessions: isSample ? [] : sessions,
+      sessions,
     };
     Share.share({ title: t.settings.exportTitle, message: JSON.stringify(data, null, 2) }).catch(
       () => {},

@@ -17,7 +17,7 @@ const BAR_WIDTH = 24;
 export function WeeklySummary() {
   const theme = useTheme();
   const { language, t } = useLanguage();
-  const { sessions, isSample } = useSessions();
+  const sessions = useSessions();
 
   const today = new Date();
   const minutesByDay = new Map<string, number>();
@@ -47,61 +47,64 @@ export function WeeklySummary() {
     <ThemedView type="backgroundElement" style={styles.card}>
       <View style={styles.header}>
         <ThemedText type="smallBold">{t.weekly.title}</ThemedText>
-        {isSample && (
-          <ThemedText type="small" themeColor="textSecondary">
-            {t.common.sampleData}
-          </ThemedText>
-        )}
       </View>
 
-      <View>
-        <ThemedText style={styles.total}>{t.common.duration(total)}</ThemedText>
-        {change !== null && (
-          <ThemedText type="small" themeColor="textSecondary">
-            {t.weekly.change(change)}
-          </ThemedText>
-        )}
-      </View>
+      {total === 0 ? (
+        <ThemedText type="small" themeColor="textSecondary">
+          {t.weekly.empty}
+        </ThemedText>
+      ) : (
+        <>
+          <View>
+            <ThemedText style={styles.total}>{t.common.duration(total)}</ThemedText>
+            {change !== null && (
+              <ThemedText type="small" themeColor="textSecondary">
+                {t.weekly.change(change)}
+              </ThemedText>
+            )}
+          </View>
 
-      <View>
-        <View style={styles.bars}>
-          {week.map((day, i) => (
-            <Pressable
-              key={toDayKey(day.date)}
-              onPress={() => setSelected(i)}
-              accessibilityLabel={`${weekday.format(day.date)} ${t.common.duration(day.minutes)}`}
-              style={styles.slot}>
-              {i === selected && (
-                <ThemedText type="small" style={styles.value}>
-                  {t.common.duration(day.minutes)}
+          <View>
+            <View style={styles.bars}>
+              {week.map((day, i) => (
+                <Pressable
+                  key={toDayKey(day.date)}
+                  onPress={() => setSelected(i)}
+                  accessibilityLabel={`${weekday.format(day.date)} ${t.common.duration(day.minutes)}`}
+                  style={styles.slot}>
+                  {i === selected && (
+                    <ThemedText type="small" style={styles.value}>
+                      {t.common.duration(day.minutes)}
+                    </ThemedText>
+                  )}
+                  <View
+                    style={[
+                      styles.bar,
+                      {
+                        height: Math.max((day.minutes / max) * CHART_HEIGHT, day.minutes > 0 ? 4 : 0),
+                        backgroundColor: Accent,
+                        opacity: i === selected ? 1 : 0.55,
+                      },
+                    ]}
+                  />
+                </Pressable>
+              ))}
+            </View>
+            <View style={[styles.baseline, { backgroundColor: theme.backgroundSelected }]} />
+            <View style={styles.labels}>
+              {week.map((day, i) => (
+                <ThemedText
+                  key={toDayKey(day.date)}
+                  type="small"
+                  themeColor={i === selected ? 'text' : 'textSecondary'}
+                  style={styles.label}>
+                  {i === 6 ? t.weekly.today : weekday.format(day.date)}
                 </ThemedText>
-              )}
-              <View
-                style={[
-                  styles.bar,
-                  {
-                    height: Math.max((day.minutes / max) * CHART_HEIGHT, day.minutes > 0 ? 4 : 0),
-                    backgroundColor: Accent,
-                    opacity: i === selected ? 1 : 0.55,
-                  },
-                ]}
-              />
-            </Pressable>
-          ))}
-        </View>
-        <View style={[styles.baseline, { backgroundColor: theme.backgroundSelected }]} />
-        <View style={styles.labels}>
-          {week.map((day, i) => (
-            <ThemedText
-              key={toDayKey(day.date)}
-              type="small"
-              themeColor={i === selected ? 'text' : 'textSecondary'}
-              style={styles.label}>
-              {i === 6 ? t.weekly.today : weekday.format(day.date)}
-            </ThemedText>
-          ))}
-        </View>
-      </View>
+              ))}
+            </View>
+          </View>
+        </>
+      )}
     </ThemedView>
   );
 }

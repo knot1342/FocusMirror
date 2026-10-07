@@ -1,4 +1,3 @@
-import { router } from 'expo-router';
 import { useState } from 'react';
 import {
   ActivityIndicator,
@@ -14,6 +13,7 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
 import { EMAIL_PATTERN, MIN_PASSWORD_LENGTH, setAccount } from '@/hooks/use-account';
+import { signIn } from '@/hooks/use-auth';
 import { useTheme } from '@/hooks/use-theme';
 import { useLanguage } from '@/i18n/language';
 import type { Translations } from '@/i18n/translations';
@@ -39,11 +39,16 @@ export default function LoginScreen() {
     }
     setError(null);
     setLoading(true);
-    // TODO: replace with a real auth call — any valid-looking email/password is accepted for now.
-    await new Promise((resolve) => setTimeout(resolve, 600));
-    await setAccount({ email: email.trim() });
+    const { error: authError } = await signIn(email.trim(), password).catch(() => ({
+      error: { code: 'network' },
+    }));
     setLoading(false);
-    router.replace('/home');
+    if (authError) {
+      setError(authError.code === 'invalid_credentials' ? 'invalidCredentials' : 'failed');
+      return;
+    }
+    // The root layout's auth guard moves to the home screen once the session is set.
+    await setAccount({ email: email.trim() });
   }
 
   const inputStyle = [

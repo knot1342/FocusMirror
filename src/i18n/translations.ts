@@ -8,6 +8,8 @@ const en = {
     errors: {
       invalidEmail: 'Enter a valid email address.',
       shortPassword: 'Password must be at least 6 characters.',
+      invalidCredentials: 'Incorrect email or password.',
+      failed: 'Could not sign in. Check your connection and try again.',
     },
   },
   home: {
@@ -15,7 +17,6 @@ const en = {
     profile: 'Profile',
   },
   common: {
-    sampleData: 'Sample data',
     duration: (minutes: number) => {
       const h = Math.floor(minutes / 60);
       const m = minutes % 60;
@@ -24,12 +25,14 @@ const en = {
   },
   weekly: {
     title: 'This week',
+    empty: 'No focus time recorded in the last 7 days.',
     today: 'Today',
     change: (percent: number) =>
       percent === 0 ? 'Same as last week' : `${percent > 0 ? '↑' : '↓'} ${Math.abs(percent)}% vs last week`,
   },
   lastSession: {
     title: 'Last session',
+    empty: 'No sessions yet. Start a focus session to see how it went.',
     focusScore: 'focus score',
     duration: 'Duration',
     distractions: 'Distractions',
@@ -161,6 +164,8 @@ const en = {
       shortPassword: 'New password must be at least 6 characters.',
       samePassword: 'New password must be different from your current password.',
       mismatch: 'New passwords do not match.',
+      wrongCurrent: 'Current password is incorrect.',
+      failed: 'Could not update the password. Try again.',
     },
   },
   tabs: {
@@ -185,11 +190,24 @@ const en = {
     title: 'Admin',
     sections: {
       streak: 'Usage streak',
+      newSession: 'Make up a session',
+      sessions: 'Saved sessions',
     },
     currentStreak: 'Current streak',
-    decrease: 'Decrease streak',
-    increase: 'Increase streak',
+    decrease: (field: string) => `Decrease ${field}`,
+    increase: (field: string) => `Increase ${field}`,
     reset: 'Reset to 0',
+    day: 'Day',
+    startTime: 'Start time',
+    daysAgo: (days: number) =>
+      days === 0 ? 'Today' : days === 1 ? 'Yesterday' : `${days} days ago`,
+    addSession: 'Add session',
+    sessionAdded: 'Session added. It now shows on the home screen.',
+    fillSample: 'Add 2 weeks of sample sessions',
+    deleteSessions: 'Delete all sessions',
+    sessionCount: (count: number) => (count === 1 ? '1 session' : `${count} sessions`),
+    sessionsNote:
+      'Made-up sessions are saved like real ones and feed the home screen cards. Delete them here or from Settings.',
     streakNote:
       'Rewrites the current run of used days so it ends today. Earlier history is kept. After a reset, today counts as used again the next time the app starts.',
   },
@@ -229,6 +247,8 @@ const ja: Translations = {
     errors: {
       invalidEmail: '有効なメールアドレスを入力してください。',
       shortPassword: 'パスワードは6文字以上で入力してください。',
+      invalidCredentials: 'メールアドレスまたはパスワードが正しくありません。',
+      failed: 'ログインできませんでした。接続を確認してもう一度お試しください。',
     },
   },
   home: {
@@ -236,7 +256,6 @@ const ja: Translations = {
     profile: 'プロフィール',
   },
   common: {
-    sampleData: 'サンプルデータ',
     duration: (minutes: number) => {
       const h = Math.floor(minutes / 60);
       const m = minutes % 60;
@@ -245,12 +264,14 @@ const ja: Translations = {
   },
   weekly: {
     title: '今週',
+    empty: '過去7日間の集中時間の記録はありません。',
     today: '今日',
     change: (percent: number) =>
       percent === 0 ? '先週と同じ' : `先週比 ${percent > 0 ? '↑' : '↓'}${Math.abs(percent)}%`,
   },
   lastSession: {
     title: '前回のセッション',
+    empty: 'まだセッションがありません。集中セッションを始めると結果がここに表示されます。',
     focusScore: '集中スコア',
     duration: '時間',
     distractions: '気が散った回数',
@@ -382,6 +403,8 @@ const ja: Translations = {
       shortPassword: '新しいパスワードは6文字以上にしてください。',
       samePassword: '新しいパスワードは現在のパスワードと異なるものにしてください。',
       mismatch: '新しいパスワードが一致しません。',
+      wrongCurrent: '現在のパスワードが正しくありません。',
+      failed: 'パスワードを更新できませんでした。もう一度お試しください。',
     },
   },
   tabs: {
@@ -406,11 +429,23 @@ const ja: Translations = {
     title: '管理者',
     sections: {
       streak: '利用の連続記録',
+      newSession: 'セッションを作成',
+      sessions: '保存済みのセッション',
     },
     currentStreak: '現在の連続記録',
-    decrease: '連続記録を減らす',
-    increase: '連続記録を増やす',
+    decrease: (field: string) => `${field}を減らす`,
+    increase: (field: string) => `${field}を増やす`,
     reset: '0にリセット',
+    day: '日付',
+    startTime: '開始時刻',
+    daysAgo: (days: number) => (days === 0 ? '今日' : days === 1 ? '昨日' : `${days}日前`),
+    addSession: 'セッションを追加',
+    sessionAdded: 'セッションを追加しました。ホーム画面に表示されます。',
+    fillSample: '2週間分のサンプルセッションを追加',
+    deleteSessions: 'すべてのセッションを削除',
+    sessionCount: (count: number) => `${count}件のセッション`,
+    sessionsNote:
+      '作成したセッションは実際のセッションと同じように保存され、ホーム画面のカードに反映されます。ここまたは設定から削除できます。',
     streakNote:
       '今日までの連続した利用日を書き換えます。それより前の履歴はそのまま残ります。リセットしても、次にアプリを起動したときに今日は利用日として記録されます。',
   },
