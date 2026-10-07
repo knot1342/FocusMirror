@@ -24,6 +24,9 @@ export const Colors = {
   },
 } as const;
 
+/** Highlight for streaks and focus charts; the same in light and dark mode. */
+export const Accent = '#FF8A00';
+
 export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
 
 export const Fonts = Platform.select({
@@ -60,6 +63,3 @@ export const Spacing = {
   five: 32,
   six: 64,
 } as const;
-
-export const BottomTabInset = Platform.select({ ios: 50, android: 80 }) ?? 0;
-export const MaxContentWidth = 800;

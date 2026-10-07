@@ -28,9 +28,17 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76
+          "backgroundColor": "#000000",
+          "image": "./assets/images/focus-mirror-logo.png",
+          "imageWidth": 200
+        }
+      ],
+      "expo-localization",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "FocusMirror uses the front camera to estimate your focus. Video stays on your device and is never saved.",
+          "recordAudioAndroid": false
         }
       ]
     ],
